@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { GoogleLogin } from 'react-google-login';
 import './App.css';
 import { GlobalWorkerOptions, getDocument } from 'pdfjs-dist';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
@@ -6,6 +7,9 @@ import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [accessToken, setAccessToken] = useState('');
+  const [file, setFile] = useState(null);
   const [quality, setQuality] = useState('');
   const [printType, setPrintType] = useState('وجه واحد');
   const [name, setName] = useState('');
@@ -15,6 +19,44 @@ function App() {
   const [price, setPrice] = useState(0);
   const [pages, setPages] = useState(0);
   const [finalPages, setFinalPages] = useState(0);
+
+  const CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+
+  const onSuccess = (res) => {
+    setIsLoggedIn(true);
+    setAccessToken(res.tokenObj.access_token);
+    alert("تم تسجيل الدخول بنجاح");
+  };
+
+  const onFailure = () => {
+    alert("فشل تسجيل الدخول");
+  };
+
+  const uploadToDrive = async () => {
+    if (!file || !accessToken) return;
+
+    const metadata = {
+      name: file.name,
+      mimeType: file.type,
+      parents: ["appDataFolder"]
+    };
+
+    const form = new FormData();
+    form.append("metadata", new Blob([JSON.stringify(metadata)], { type: "application/json" }));
+    form.append("file", file);
+
+    const response = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", {
+      method: "POST",
+      headers: new Headers({ Authorization: "Bearer " + accessToken }),
+      body: form
+    });
+
+    if (response.ok) {
+      alert("تم رفع الملف إلى Google Drive بنجاح");
+    } else {
+      alert("حدث خطأ أثناء رفع الملف");
+    }
+  };
 
   const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
@@ -67,7 +109,6 @@ function App() {
     }
   };
 
-
   const handleQualityChange = (e) => {
     const selected = e.target.value;
     setQuality(selected);
@@ -106,34 +147,46 @@ function App() {
   return (
     <div className="App">
       
-      <img src="/logo.png" alt="Logo" style={{ width: '120px', margin: '0 auto 20px', display: 'block' }} />
-      <h1>طلب طباعة</h1>
-      <input type="file" accept="application/pdf" multiple onChange={handleFileChange} /><br /><br />
-
-      <label>اختر نوع الطباعة:</label>
-      <select onChange={handlePrintTypeChange}>
-        <option value="وجه واحد">وجه واحد</option>
-        <option value="وجهين">وجهين</option>
-      </select><br /><br />
-
-      <label>اختر الجودة:</label>
-      <select onChange={handleQualityChange}>
-        <option value="">-- اختر --</option>
-        <option value="متوسطة">متوسطة</option>
-        <option value="ممتازة">ممتازة</option>
-      </select><br /><br />
-
-      <input type="text" placeholder="الاسم" onChange={(e) => setName(e.target.value)} /><br /><br />
-      <input type="text" placeholder="رقم الهاتف" onChange={(e) => setPhone(e.target.value)} /><br /><br />
-      <input type="text" placeholder="العنوان" onChange={(e) => setAddress(e.target.value)} /><br /><br />
-      <button onClick={getLocation}>تحديد موقعي الحالي</button><br /><br />
+      ^_^
+        <>
+          <img src="/logo.png" alt="Logo" style={{ width: '120px', margin: '0 auto 20px', display: 'block' }} />
+          <h1>طلب طباعة</h1>
+          <div style={{ marginBottom: '30px', textAlign: 'center' }}>
+        <GoogleLogin
+          clientId={CLIENT_ID}
+          buttonText="تسجيل الدخول بـ Google"
+          onSuccess={onSuccess}
+          onFailure={onFailure}
+          cookiePolicy={'single_host_origin'}
+          scope="https://www.googleapis.com/auth/drive.file" /> </div>
+          <input type="file" accept="application/pdf" multiple onChange={handleFileChange} /><br /><br />
+          <button onClick={uploadToDrive}>رفع الملف إلى Google Drive</button><br /><br />
 
 
-      <p>عدد الصفحات في الملفات: {pages}</p>
-      <p>عدد الصفحات المطلوبة للطباعة: {finalPages}</p>
-      <p>السعر الكلي: {price.toFixed(0)} دينار</p>
+          <label>اختر نوع الطباعة:</label>
+          <select onChange={handlePrintTypeChange}>
+            <option value="وجه واحد">وجه واحد</option>
+            <option value="وجهين">وجهين</option>
+          </select><br /><br />
 
-      <button onClick={handleSendTelegram}>إرسال الطلب إلى التليغرام</button>
+          <label>اختر الجودة:</label>
+          <select onChange={handleQualityChange}>
+           
+            <option value="متوسطة">متوسطة</option>
+            <option value="ممتازة">ممتازة</option>
+          </select><br /><br />
+
+          <input type="text" placeholder="الاسم" onChange={(e) => setName(e.target.value)} /><br /><br />
+          <input type="text" placeholder="رقم الهاتف" onChange={(e) => setPhone(e.target.value)} /><br /><br />
+          <input type="text" placeholder="العنوان" onChange={(e) => setAddress(e.target.value)} /><br /><br />
+          <button onClick={getLocation}>تحديد موقعي الحالي</button><br /><br />
+
+          <p>عدد الصفحات في الملفات: {pages}</p>
+          <p>عدد الصفحات المطلوبة للطباعة: {finalPages}</p>
+          <p>السعر الكلي: {price.toFixed(0)} دينار</p>
+
+          <button onClick={handleSendTelegram}>إرسال الطلب إلى التليغرام</button>
+        </>
     </div>
   );
 }
