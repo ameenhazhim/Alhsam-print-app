@@ -5,7 +5,7 @@ import { GlobalWorkerOptions, getDocument } from 'pdfjs-dist';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 
 GlobalWorkerOptions.workerSrc = pdfjsWorker;
-
+//تعديل الاجبار//
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState('');
@@ -147,7 +147,7 @@ function App() {
   return (
     <div className="App">
       
-      ^_^
+      ^_^.
         <>
           <img src="/logo.png" alt="Logo" style={{ width: '120px', margin: '0 auto 20px', display: 'block' }} />
           <h1>طلب طباعة</h1>
