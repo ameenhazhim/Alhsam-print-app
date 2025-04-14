@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { GoogleLogin } from 'react-google-login';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import './App.css';
 import { GlobalWorkerOptions, getDocument } from 'pdfjs-dist';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 
 GlobalWorkerOptions.workerSrc = pdfjsWorker;
-//تعديل الاجبار//
+//ameen hazim//
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState('');
@@ -38,7 +38,7 @@ function App() {
     const metadata = {
       name: file.name,
       mimeType: file.type,
-      parents: ["appDataFolder"]
+      parents: ["1_VK1V851ySGZr6EMaw0beonwkIPj-QwJ"]
     };
 
     const form = new FormData();
@@ -145,13 +145,16 @@ function App() {
   };
 
   return (
+    <GoogleOAuthProvider clientId={CLIENT_ID}>
     <div className="App">
       
-      ^_^.
+      ^_^
         <>
           <img src="/logo.png" alt="Logo" style={{ width: '120px', margin: '0 auto 20px', display: 'block' }} />
           <h1>طلب طباعة</h1>
           <div style={{ marginBottom: '30px', textAlign: 'center' }}>
+
+            
         <GoogleLogin
           clientId={CLIENT_ID}
           buttonText="تسجيل الدخول بـ Google"
@@ -161,6 +164,7 @@ function App() {
           scope="https://www.googleapis.com/auth/drive.file" /> </div>
           <input type="file" accept="application/pdf" multiple onChange={handleFileChange} /><br /><br />
           <button onClick={uploadToDrive}>رفع الملف إلى Google Drive</button><br /><br />
+
 
 
           <label>اختر نوع الطباعة:</label>
@@ -188,6 +192,7 @@ function App() {
           <button onClick={handleSendTelegram}>إرسال الطلب إلى التليغرام</button>
         </>
     </div>
+    </GoogleOAuthProvider>
   );
 }
 
