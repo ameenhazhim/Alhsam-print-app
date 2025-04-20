@@ -32,7 +32,11 @@ function App() {
   const onFailure = () => {
     alert("فشل تسجيل الدخول");
   };
+  
 
+
+
+  
   const uploadToDrive = async () => {
     if (!file || !accessToken) {
       alert("الرجاء التأكد من تحديد الملف وتسجيل الدخول أولاً");
@@ -55,11 +59,13 @@ function App() {
         headers: new Headers({ Authorization: "Bearer " + accessToken }),
         body: form
       });
-
-      if (response.ok) {
-        alert("تم رفع الملف إلى Google Drive بنجاح");
-      } else {
+      
+      if (!response.ok) {
+        const errorResponse = await response.json();
+        console.error("Error details:", errorResponse);
         alert("حدث خطأ أثناء رفع الملف");
+      } else {
+        alert("تم رفع الملف إلى Google Drive بنجاح");
       }
     } catch (error) {
       console.error("Error uploading file:", error);
