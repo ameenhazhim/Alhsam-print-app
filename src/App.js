@@ -162,7 +162,9 @@ function Home() {
   };
 
   return (
+    
     <div className="App">
+      ^_^
       <img src="/logo.png" alt="Logo" style={{ width: '120px', margin: '0 auto 20px', display: 'block' }} />
       <h1>طلب طباعة</h1>
 
