@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
-import './App.css';
 import { GlobalWorkerOptions, getDocument } from 'pdfjs-dist';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import PrivacyPolicy from './privacy-policy';
+import './App.css';
 
 GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
-function App() {
+function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState('');
   const [file, setFile] = useState(null);
@@ -46,7 +48,7 @@ function App() {
     const metadata = {
       name: file.name,
       mimeType: file.type,
-      parents: ["1_VK1V851ySGZr6EMaw0beonwkIPj-QwJ"]  // تأكد من أن لديك المجلد الصحيح على Google Drive
+      parents: ["1_VK1V851ySGZr6EMaw0beonwkIPj-QwJ"]
     };
 
     const form = new FormData();
@@ -160,46 +162,63 @@ function App() {
   };
 
   return (
-    <GoogleOAuthProvider clientId={CLIENT_ID}>
-      <div className="App">
-        <img src="/logo.png" alt="Logo" style={{ width: '120px', margin: '0 auto 20px', display: 'block' }} />
-        <h1>طلب طباعة</h1>
-        <div style={{ marginBottom: '30px', textAlign: 'center' }}>
-          <GoogleLogin
-            clientId={CLIENT_ID}
-            buttonText="تسجيل الدخول بـ Google"
-            onSuccess={onSuccess}
-            onFailure={onFailure}
-            cookiePolicy={'single_host_origin'}
-            scope="https://www.googleapis.com/auth/drive.file"
-          />
-        </div>
-        <input type="file" accept="application/pdf" multiple onChange={handleFileChange} /><br /><br />
-        <button onClick={uploadToDrive}>رفع الملف إلى Google Drive</button><br /><br />
+    <div className="App">
+      <img src="/logo.png" alt="Logo" style={{ width: '120px', margin: '0 auto 20px', display: 'block' }} />
+      <h1>طلب طباعة</h1>
 
-        <label>اختر نوع الطباعة:</label>
-        <select onChange={handlePrintTypeChange}>
-          <option value="وجه واحد">وجه واحد</option>
-          <option value="وجهين">وجهين</option>
-        </select><br /><br />
-
-        <label>اختر الجودة:</label>
-        <select onChange={handleQualityChange}>
-          <option value="متوسطة">متوسطة</option>
-          <option value="ممتازة">ممتازة</option>
-        </select><br /><br />
-
-        <input type="text" placeholder="الاسم" onChange={(e) => setName(e.target.value)} /><br /><br />
-        <input type="text" placeholder="رقم الهاتف" onChange={(e) => setPhone(e.target.value)} /><br /><br />
-        <input type="text" placeholder="العنوان" onChange={(e) => setAddress(e.target.value)} /><br /><br />
-        <button onClick={getLocation}>تحديد موقعي الحالي</button><br /><br />
-
-        <p>عدد الصفحات في الملفات: {pages}</p>
-        <p>عدد الصفحات المطلوبة للطباعة: {finalPages}</p>
-        <p>السعر الكلي: {price.toFixed(0)} دينار</p>
-
-        <button onClick={handleSendTelegram}>إرسال الطلب إلى التليغرام</button>
+      <div style={{ marginBottom: '30px', textAlign: 'center' }}>
+        <GoogleLogin
+          clientId={CLIENT_ID}
+          buttonText="تسجيل الدخول بـ Google"
+          onSuccess={onSuccess}
+          onFailure={onFailure}
+          cookiePolicy={'single_host_origin'}
+          scope="https://www.googleapis.com/auth/drive.file"
+        />
       </div>
+
+      <input type="file" accept="application/pdf" multiple onChange={handleFileChange} /><br /><br />
+      <button onClick={uploadToDrive}>رفع الملف إلى Google Drive</button><br /><br />
+
+      <label>اختر نوع الطباعة:</label>
+      <select onChange={handlePrintTypeChange}>
+        <option value="وجه واحد">وجه واحد</option>
+        <option value="وجهين">وجهين</option>
+      </select><br /><br />
+
+      <label>اختر الجودة:</label>
+      <select onChange={handleQualityChange}>
+        <option value="متوسطة">متوسطة</option>
+        <option value="ممتازة">ممتازة</option>
+      </select><br /><br />
+
+      <input type="text" placeholder="الاسم" onChange={(e) => setName(e.target.value)} /><br /><br />
+      <input type="text" placeholder="رقم الهاتف" onChange={(e) => setPhone(e.target.value)} /><br /><br />
+      <input type="text" placeholder="العنوان" onChange={(e) => setAddress(e.target.value)} /><br /><br />
+      <button onClick={getLocation}>تحديد موقعي الحالي</button><br /><br />
+
+      <p>عدد الصفحات في الملفات: {pages}</p>
+      <p>عدد الصفحات المطلوبة للطباعة: {finalPages}</p>
+      <p>السعر الكلي: {price.toFixed(0)} دينار</p>
+
+      <button onClick={handleSendTelegram}>إرسال الطلب إلى التليغرام</button>
+      <br /><br />
+      <Link to="/privacy-policy">سياسة الخصوصية</Link>
+    </div>
+  );
+}
+
+function App() {
+  const CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+
+  return (
+    <GoogleOAuthProvider clientId={CLIENT_ID}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        </Routes>
+      </Router>
     </GoogleOAuthProvider>
   );
 }
