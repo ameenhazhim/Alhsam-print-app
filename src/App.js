@@ -180,7 +180,7 @@ function Home() {
       </div>
 
       <input type="file" accept="application/pdf" multiple onChange={handleFileChange} /><br /><br />
-      <button onClick={uploadToDrive}>رفع الملف إلى Google Drive</button><br /><br />
+      
 
       <label>اختر نوع الطباعة:</label>
       <select onChange={handlePrintTypeChange}>
@@ -197,16 +197,16 @@ function Home() {
       <input type="text" placeholder="الاسم" onChange={(e) => setName(e.target.value)} /><br /><br />
       <input type="text" placeholder="رقم الهاتف" onChange={(e) => setPhone(e.target.value)} /><br /><br />
       <input type="text" placeholder="العنوان" onChange={(e) => setAddress(e.target.value)} /><br /><br />
-      <button onClick={getLocation}>تحديد موقعي الحالي</button><br /><br />
-
       <p>عدد الصفحات في الملفات: {pages}</p>
       <p>عدد الصفحات المطلوبة للطباعة: {finalPages}</p>
       <p>السعر الكلي: {price.toFixed(0)} دينار</p>
-
+      
+      <button onClick={uploadToDrive}>رفع الملف إلى Google Drive</button><br /><br />
       <button onClick={handleSendTelegram}>إرسال الطلب إلى التليغرام</button>
       <br /><br />
       <Link to="/privacy-policy">سياسة الخصوصية</Link>
     </div>
+    
   );
 }
 
